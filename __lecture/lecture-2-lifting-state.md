@@ -59,16 +59,18 @@ Solve me:
 
 ```js
 const App = () => {
+    const [searchTerm, setSearchTerm] = React.useState('');
   return (
     <>
-      <Header />
-      <MainContent />
+      <Header searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      />
+      <MainContent setSearchTerm={setSearchTerm}/>
     </>
   );
 };
 
-const Header = () => {
-  const [searchTerm, setSearchTerm] = React.useState('');
+const Header = ({searchTerm, setSearchTerm}) => {
 
   return (
     <header>
