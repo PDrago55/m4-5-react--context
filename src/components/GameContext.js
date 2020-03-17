@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useInterval from "../hooks/use-interval.hook";
 
-export const GameContext = React.createContext(null);
+export const GameContext = React.createContext();
 
 export const GameProvider = ({ children }) => {
   const [numCookies, setNumCookies] = useState(1000);

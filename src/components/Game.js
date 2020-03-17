@@ -21,7 +21,7 @@ const Game = props => {
     if (data) {
       setNumCookies(JSON.parse(data));
     }
-  }, []);
+  }, [setNumCookies]);
 
   React.useEffect(() => {
     localStorage.setItem("stored-stats", JSON.stringify(numCookies));
