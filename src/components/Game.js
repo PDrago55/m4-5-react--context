@@ -1,66 +1,69 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import React from "react";
+import styled from "styled-components";
+import { Link } from "react-router-dom";
 
-import useInterval from '../hooks/use-interval.hook';
+import { GameContext } from "./GameContext";
+import cookieSrc from "../cookie.svg";
+import Item from "./Item";
 
-import cookieSrc from '../cookie.svg';
-import Item from './Item';
+const Game = props => {
+  //console.log("PROPS.ITEMS", props.items);
+  const {
+    numCookies,
+    setNumCookies,
+    purchasedItems,
+    setPurchasedItems,
+    cookiesPerSecond
+  } = React.useContext(GameContext);
 
-const items = [
-  { id: 'cursor', name: 'Cursor', cost: 10, value: 1 },
-  { id: 'grandma', name: 'Grandma', cost: 100, value: 10 },
-  { id: 'farm', name: 'Farm', cost: 1000, value: 80 }
-];
+  React.useEffect(() => {
+    const data = localStorage.getItem("stored-stats");
+    if (data) {
+      setNumCookies(JSON.parse(data));
+    }
+  }, [setNumCookies]);
 
-const calculateCookiesPerSecond = purchasedItems => {
-  return Object.keys(purchasedItems).reduce((acc, itemId) => {
-    const numOwned = purchasedItems[itemId];
-    const item = items.find(item => item.id === itemId);
-    const value = item.value;
-
-    return acc + value * numOwned;
-  }, 0);
-};
-
-const Game = () => {
-  const [numCookies, setNumCookies] = React.useState(1000);
-
-  const [purchasedItems, setPurchasedItems] = React.useState({
-    cursor: 0,
-    grandma: 0,
-    farm: 0
+  React.useEffect(() => {
+    localStorage.setItem("stored-stats", JSON.stringify(numCookies));
   });
+
+  /////// This stores my purchased points... I commentted it out because
+  /////// it was annoying to see the accumulation...
+
+  // React.useEffect(() => {
+  //   const purchaseData = localStorage.getItem("purchased");
+  //   if (purchaseData) {
+  //     setPurchasedItems(JSON.parse(purchaseData));
+  //   }
+  // }, []);
+
+  // React.useEffect(() => {
+  //   localStorage.setItem("purchased", JSON.stringify(purchasedItems));
+  // });
 
   const incrementCookies = () => {
     setNumCookies(c => c + 1);
   };
 
-  useInterval(() => {
-    const numOfGeneratedCookies = calculateCookiesPerSecond(purchasedItems);
-
-    setNumCookies(numCookies + numOfGeneratedCookies);
-  }, 1000);
-
   React.useEffect(() => {
     document.title = `${numCookies} cookies - Cookie Clicker Workshop`;
 
     return () => {
-      document.title = 'Cookie Clicker Workshop';
+      document.title = "Cookie Clicker Workshop";
     };
   }, [numCookies]);
 
   React.useEffect(() => {
     const handleKeydown = ev => {
-      if (ev.code === 'Space') {
+      if (ev.code === "Space") {
         incrementCookies();
       }
     };
 
-    window.addEventListener('keydown', handleKeydown);
+    window.addEventListener("keydown", handleKeydown);
 
     return () => {
-      window.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener("keydown", handleKeydown);
     };
   });
 
@@ -69,8 +72,7 @@ const Game = () => {
       <GameArea>
         <Indicator>
           <Total>{numCookies} cookies</Total>
-          <strong>{calculateCookiesPerSecond(purchasedItems)}</strong> cookies
-          per second
+          <strong>{cookiesPerSecond}</strong> cookies per second
         </Indicator>
         <Button onClick={incrementCookies}>
           <Cookie src={cookieSrc} />
@@ -79,7 +81,8 @@ const Game = () => {
 
       <ItemArea>
         <SectionTitle>Items:</SectionTitle>
-        {items.map((item, index) => {
+        {props.items.map((item, index) => {
+          // console.log("RIGHT BEFORE RENDER SECTION", items);
           return (
             <Item
               key={item.id}
@@ -90,7 +93,7 @@ const Game = () => {
               numOwned={purchasedItems[item.id]}
               handleAttemptedPurchase={() => {
                 if (numCookies < item.cost) {
-                  alert('Cannot afford item');
+                  alert("Cannot afford item");
                   return;
                 }
 
